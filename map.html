@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <title>Tesla Location</title>
+        <meta charset="UTF-8">
+        <link rel="stylesheet" type="text/css" href="main.css">
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    </head>
+
+    <body onload="onloadMapUpdate">
+
+        <div class="app-wrap">
+            <div class="map-app-header">
+                <h1 class="main-header">Tesla App</h1>
+                <div class="sub-header">
+                    <h3>Map Status:</h3>
+                    <p class="info" id="mapStatus"></p>
+                </div>
+            </div>
+            <br>
+
+            <div class="content">
+                <div class="map-container" id="map">
+                </div>
+            </div>
+
+            <div class="button-container">
+                <div class="buttonMenu">
+                    <button class="btn back fa fa-arrow-left"></button>
+                    <button class="btn updateLocation">Update Location</button>
+                </div>
+            </div>
+        </div>
+
+
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+        <script src="teslarequests.js"></script>
+        <script async defer
+        src="http://maps.googleapis.com/maps/api/js?key=AIzaSyBpi3c7X8aAqGEMCiWDEhxlODHjj-SD-1U&callback=onloadMapUpdate">
+        </script>
+    </body>
+</html>

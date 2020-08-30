@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <title>Tesla App</title>
+        <meta charset="UTF-8">
+        <link rel="stylesheet" type="text/css" href="main.css">
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+        <link href="https://fonts.googleapis.com/css?family=Roboto&display=swap" rel="stylesheet">
+    </head>
+    <body class="body">
+
+        <div class="login-container login-overflow">
+
+            <div class="login">
+                <form action='#' onsubmit='getFormData();return false;' class="login-form vertical-center">
+                    <h1 id="login-header">Login</h1>
+                    <input type="text" name="username" id="user" class="login-input" placeholder="Tesla Email">
+                    <br><br>
+                    <input type="password" name="password" id="pass" class="login-input" placeholder="Tesla Password">
+                    <br>
+                    <label for="show-password" class="field__toggle" class="showPassword">
+                        <input type="checkbox" onclick="showPassword()" id="show-password" class="field__toggle-input" />
+                        Show password
+                    </label>
+                    <br><br>
+                    <button class="login-btn" type="submit" id="loginSubmit">Login</button>
+                  </form> 
+
+                  <br><br>
+                  <div class="connectionStatusDiv login-form">
+                      <p id="connectionStatus"></p>
+                  </div>
+            </div>
+            
+            <ul class="bg-bubbles">
+                <li></li>
+                <li></li>
+                <li></li>
+                <li></li>
+                <li></li>
+                <li></li>
+                <li></li>
+                <li></li>
+                <li></li>
+                <li></li>
+            </ul>
+        </div>
+
+        <div class="app-wrap hidden" id="app-wrapper">
+
+            <div class="vehiclePic">
+                <img id="vehicleImg">
+            </div>
+
+            <div class="content">
+                <div class="genericInfo">
+                    <div class="titleInfoBlock">
+                        <h3>Display Name:</h3>
+                        <p class="info" id="name"></p>
+                    </div>
+
+                    <div class="titleInfoBlock">
+                        <h3>Current State:</h3>
+                        <p class="info" id="currentState"></p>
+                    </div>
+                </div>
+
+                <div class="genericInfo">
+                    <div class="titleInfoBlock">
+                        <h3>Odometer:</h3>
+                        <p class="info" id="odometer"></p>
+                    </div>
+
+                    <div class="titleInfoBlock">
+                        <h3>Sentry Mode:</h3>
+                        <p class="info" id="sentry"></p>
+                    </div>
+                </div>
+
+                <div class="genericInfo">
+                    <div class="titleInfoBlock">
+                        <h3>Model:</h3>
+                        <p class="info" id="model"></p>
+                    </div>
+
+                    <div class="titleInfoBlock">
+                        <h3>Version:</h3>
+                        <p class="info" id="version"></p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="content">
+                <div class="genericInfo left">
+                    <h2>Climate</h2>
+                    <div class="titleInfoBlock">
+                        <h3>Inside:</h3>
+                        <p class="info" id="insideTemp"></p>
+                    </div>
+
+                    <div class="titleInfoBlock icon">
+                        <button class="btn icon" id="ac-on-off"><img src="img/Climate-Off.png"></button>
+                    </div>
+
+                    <br>
+                    <div class="titleInfoBlock icon">
+                        <button class="btn" id="climateControls">Controls</button>
+                    </div>
+                </div>
+
+                <div class="genericInfo">
+                    <h2>Charge</h2>
+                    <div class="titleInfoBlock">
+                        <h3>Range:</h3>
+                        <p class="info" id="range"></p>
+                    </div>
+
+                    <div class="titleInfoBlock">
+                        <h3>Charge State:</h3>
+                        <p class="info" id="chargeState"></p>
+                    </div>
+            
+                    <div class="titleInfoBlock">
+                        <h3>Rate:</h3>
+                        <p class="info" id="chargeRate"></p>
+                    </div>
+
+                    <div class="titleInfoBlock">
+                        <h3>Time Remaining:</h3>
+                        <p class="info" id="remaining"></p>
+                    </div>
+
+                    <div class="titleInfoBlock">
+                        <h3></h3>
+                        <p></p>
+                    </div>
+                </div>
+
+                <div class="genericInfo right">
+                    <h2>Controls</h2>
+                    <br>
+                    <div class="titleInfoBlock">
+                        <button class="btn lock-unlock fa fa-lock"></button>
+                    </div>
+            
+                    <br>
+                    <div class="titleInfoBlock icon">
+                        <button class="btn frunk"><img src="img/Frunk-TR.png"></button>
+                    </div>
+                    <br>
+
+                    <div class="titleInfoBlock icon">
+                        <button class="btn boot"><img src="img/Boot-TR.png"></button>
+                    </div>
+
+                </div>
+            </div>
+
+            <div class="content">
+                <div class="genericInfo">
+                    <div class="titleInfoBlock">
+                        <h3>Last Action:</h3>
+                        <p class="info" id="last_action"></p>
+                        
+                    </div>
+
+                    <div class="titleInfoBlock">
+                        <h3>Last Updated:</h3>
+                        <p class="info" id="last_updated"></p>
+                        
+                    </div>
+                </div>
+
+                
+
+                <div class="genericInfo">
+                    <div class="titleInfoBlock buttons-seperated">
+                        <button class="btn getInfo">Get Info</button>
+                    </div>
+                    <div class="titleInfoBlock buttons-seperated">
+                        <button class="btn location">Location</button>
+                    </div>
+                    <div class="titleInfoBlock buttons-seperated">
+                        <button class="btn honkhorn">Honk Horn</button>
+                    </div>
+                    <div class="titleInfoBlock buttons-seperated">
+                        <button class="btn flashlights">Flash Lights</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="app-wrap hidden" id="climateControl-wrapper">
+            
+            <div class="vehiclePic">
+                <img id="vehicleImg2">
+            </div>
+
+            <div class="button-container">
+                <div class="buttonMenu">
+                    <button class="back-main fa fa-arrow-left"></button>
+                    <h1 class="climate-header">Climate</h1>
+                </div>
+            </div>
+
+            <div class="content">
+                <div class="genericInfo">
+                    <div class="titleInfoBlock">
+                        <h3>Inside:</h3>
+                        <p class="info" id="insideTempClimate"></p>
+                    </div>
+            
+                    <div class="titleInfoBlock">
+                        <h3>Outside:</h3>
+                        <p class="info" id="outsideTempClimate"></p>
+                    </div>
+
+                    <div class="titleInfoBlock icon">
+                        <button class="btn" id=""></button>
+                    </div>
+                </div>
+
+                <div class="genericInfo">
+                    <div class="titleInfoBlock icon">
+                        <button class="btn ac" id="ac-on-off2"><img src="img/Climate-Off.png"></button>
+                    </div>
+
+                    <br>
+                    <div class="titleInfoBlock icon">
+                        <button class="btn" id=""></button>
+                    </div>
+
+                    <div class="titleInfoBlock">
+                        <h3></h3>
+                        <p></p>
+                    </div>
+                </div>
+
+                <div class="genericInfo right">
+                    <div class="titleInfoBlock icon">
+                        <button class="btn ac" id="a">Apple</button>
+                    </div>
+                    <br>
+                    <div class="titleInfoBlock icon">
+                        <button class="btn ac" id="a">Banana</button>
+                    </div>
+                    <br>
+                    <div class="titleInfoBlock icon">
+                        <button class="btn ac" id="a">Cantalope</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="content">
+                <div class="genericInfo">
+                    <div class="titleInfoBlock">
+                        <h3>Last Action:</h3>
+                        <p class="info" id="last_action2"></p>
+                        
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+        
+
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+        <script src="teslarequests.js"></script>
+        <script async defer
+        src="http://maps.googleapis.com/maps/api/js?key=AIzaSyBpi3c7X8aAqGEMCiWDEhxlODHjj-SD-1U">
+        </script>
+    </body>
+</html>
