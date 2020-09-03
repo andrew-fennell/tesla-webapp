@@ -122,6 +122,11 @@ function getFormData() {
 
     connectionStatus.innerText = 'Connecting to vehicle';
 
+    if (entered_user == "admin" && entered_pass == "pass") {
+        showFake();
+        showPage();
+    }
+
     getAuthToken();
     
     let count = 0;
@@ -685,5 +690,94 @@ function toggleAC() {
     }
 
         
+}
+
+function showFake() {
+    last_action.innerHTML = "<h2 style='margin-bottom: 0px; border-bottom: none;'>This is a preview version of this web application.<h2>"
+
+    let range_units = -1;
+    let range_units_time = -1;
+    let temp_units = -1;
+
+    range_units = "miles"
+    range_units_time = "mi/hr"
+
+    temp_units = "°F";
+
+    vehicle_id = -1;
+    display_name = "Tester";
+    if (document.location.href.split('/').pop().split('?')[0] != "map.html") {
+        document.location.href.split('/').pop().split('?')[0];
+        vehicle_name.innerText = display_name;
+
+        state.innerText = "Online";
+
+        car_type = "model3";
+        wheel_type = "Sports19";
+        exterior_color = "Red";
+
+        vehicleImg.src = `./img/${car_type}/${wheel_type}/${exterior_color}.png`;
+        vehicleImg2.src = `./img/${car_type}/${wheel_type}/${exterior_color}.png`;
+
+        inside_temp = 74;
+        insideTemperature.innerText = Math.round(inside_temp) + " " + temp_units;
+        insideTemperatureClimate.innerText = Math.round(inside_temp) + " " + temp_units;
+
+        outside_temp = 90;
+        outsideTemperatureClimate.innerText = Math.round(outside_temp) + " " + temp_units;
+
+        odometer_miles = 12345;
+        odometer_miles = Math.round(odometer_miles);
+        odometer.innerText = odometer_miles + " miles";
+
+        climate_mode = 1;
+        if (climate_mode) {
+            climate_mode = "On";
+            acOnOff.innerHTML = "<img src='img/Climate-On.png'>"
+        } else {
+            climate_mode = "Off";
+            acOnOff.innerHTML = "<img src='img/Climate-Off.png'>"
+        }
+
+        range.innerText = "155 miles (50%)";
+
+        chargeState.innerText = "Charging";
+
+        chargeRate.innerText = "40 " + "mi/hr";
+
+        timeRemaining = 3.875;
+        if (timeRemaining) {
+            let hours = timeRemaining - (timeRemaining % 1);
+            let minutes = Math.round((timeRemaining % 1) * 60);
+            timeRemaining = `${hours} hr ${minutes} min`;
+
+            remaining.innerText = timeRemaining;
+        }
+
+        model.innerText = "3";
+
+        version.innerText = "2020.32.3";
+
+        sentryMode = "Online";
+        sentry.innerText = sentryMode;
+
+        door_state = 1;
+        lockUnlock.toggleClass('fa-lock');
+        if (door_state) {
+            door_state = "locked";
+            lockUnlock.addClass('fa-lock');
+        } else {
+            door_state = "unlocked";
+            lockUnlock.addClass('fa-unlock');
+        }
+
+        if (loaded == 0) {
+            showPage();
+            loaded = 1;
+        } 
+    }
+
+    current_time = getCurrentTime();
+    last_updated.innerText = `${current_time}`;
 }
 
