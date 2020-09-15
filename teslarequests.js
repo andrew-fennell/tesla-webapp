@@ -1,3 +1,4 @@
+
 // primary info
 var vehicle_name = document.getElementById('name');
 var state = document.getElementById('currentState');
@@ -20,7 +21,11 @@ var range = document.getElementById('range');
 var chargeState = document.getElementById('chargeState');
 var chargeRate = document.getElementById('chargeRate');
 var remaining = document.getElementById('remaining');
+var currentTemp = document.getElementById('current-temp');
 
+let range_units = -1;
+let range_units_time = -1;
+let temp_units = -1;
 
 
 // tertiary info
@@ -87,13 +92,22 @@ function showPage() {
     setTimeout(function() { $('.login-container').addClass('hidden'); $('.login-container').removeClass('screen-wipe'); $('#app-wrapper').removeClass('screenWipeUpFromBottom'); }, 1000);
 }
 
-function wipeDown() {
+function wipeDown(id) {
     $('.body').addClass('login-overflow');
-    $('#climateControl-wrapper').addClass('hidden');
+    $(id).addClass('hidden');
     $('#app-wrapper').removeClass('hidden');
     $('#app-wrapper').addClass('screenWipeDown');
 
     setTimeout(function() { $('#app-wrapper').removeClass('screenWipeDown'); }, 1000);
+}
+
+function openMap() {
+    $('#app-wrapper').addClass('hidden');
+    $('#map-wrapper').removeClass('hidden'); 
+    $('#map-wrapper').addClass('screenWipeUpFromBottom');
+    $('.body').addClass('login-overflow');
+
+    setTimeout(function() {  $('#map-wrapper').removeClass('screenWipeUpFromBottom'); $('.body').removeClass('login-overflow'); }, 1200);
 }
 
 function openClimateControls() {
@@ -143,10 +157,10 @@ function getFormData() {
         if (count == 20) {
             clearInterval(vehicleConnecting);
         }
-    }, 500);
+    }, 2000);
     
     setTimeout(function() {
-        if (count < 20) {
+        if (count < 10) {
             clearInterval(vehicleConnecting);
         } else {
             connectionStatus.innerText = 'Could not connect to vehicle\nPlease check your login credentials.';
@@ -176,35 +190,30 @@ function getFormData() {
 
 function getAuthToken() {
     let Url = `https://cors-anywhere.herokuapp.com/https://owner-api.teslamotors.com/oauth/token?grant_type=password&client_id=${login_info["client_id"]}&client_secret=${login_info["client_secret"]}&email=${login_info["email"]}&password=${login_info["password"]}`;
-        $.ajax({
-            url: Url,
-            headers: {
-                "content-type":"application/json; charset=UTF-8"
-            },
-            type: "POST",
-            success: function(result){
-                auth_token = result["access_token"];
-            },
-            error:function(error){
-                console.log(`Error ${error}`)
-            }
-        })
+    $.ajax({
+        url: Url,
+        headers: {
+            "content-type":"application/json; charset=UTF-8"
+        },
+        type: "POST",
+        success: function(result){
+            auth_token = result["access_token"];
+        },
+        error:function(error){
+            console.log(`Error ${error}`)
+        }
+    })
 }
 
 $(document).ready(function(){
 
-    if (document.location.href.split('.html')[0].split('/').pop() == 'index' && 
-    document.location.href.split('index.html?').pop().split('=')[0] == 'auth') {
-
-        auth_token = document.location.href.split('?').pop().split('&')[0].split('=').pop();
-
-        showPage();
-        connectVehicle(auth_token);
-
-    }
-
     $('#climateControls').click(function() {
         openClimateControls();
+    })
+
+    $('#mapButton').click(function() {
+        updateMap();
+        openMap();
     })
 
     $("#ac-on-off").click(function() {
@@ -215,8 +224,12 @@ $(document).ready(function(){
         toggleAC();
     })
 
-    $(".back-main").click(function() {
-        wipeDown();
+    $(".back-main-climate").click(function() {
+        wipeDown('#climateControl-wrapper');
+    })
+
+    $(".back-main-map").click(function() {
+        wipeDown('#map-wrapper');
     })
 
     $('.honkhorn').click(function() {
@@ -344,31 +357,6 @@ $(document).ready(function(){
         getInfo(auth_token);
     })
 
-    $('.location').click(function() {
-        Url=`https://cors-anywhere.herokuapp.com/https://owner-api.teslamotors.com/api/1/vehicles/${vehicle_id}/vehicle_data`;
-        $.ajax({
-            url: Url,
-            headers: {
-                "content-type":"application/json; charset=UTF-8",
-                "Authorization":`Bearer ${auth_token}`
-            },
-            type: "GET",
-            success: function(result){
-                console.log(result);
-
-                current_lat = result["response"]["drive_state"]["latitude"];
-                current_lng = result["response"]["drive_state"]["longitude"];
-
-                window.location.href = `map.html?auth=${auth_token}&vehicle_id=${vehicle_id}`;
-                
-            },
-            error:function(error){
-                console.log(`Error ${error}`);
-                window.location.href = `map.html`;
-            }
-        })
-    })
-
     $('.back').click(function() {
         window.location.href = `index.html?auth=${auth_token}&vehicle_id=${vehicle_id}`;
     })
@@ -389,6 +377,62 @@ $(document).ready(function(){
             success: function(result){
                 console.log(`${vehicle_id}'s lights flashed.`);
                 last_action.innerText = `${display_name}'s lights flashed.`;
+            },
+            error:function(error){
+                console.log(`Error ${error}`);
+            }
+        })
+    })
+
+    $('#air-up').click(function() {
+        let new_temp = inside_temp + 1;
+        Url=`https://cors-anywhere.herokuapp.com/https://owner-api.teslamotors.com/api/1/vehicles/${vehicle_id}/command/set_temps?driver_temp=${new_temp}`;
+        $.ajax({
+            url: Url,
+            headers: {
+                "content-type":"application/json; charset=UTF-8",
+                "Authorization":`Bearer ${auth_token}`
+            },
+            type: "Post",
+            success: function(result){
+                console.log(`${vehicle_id}'s adjusted up.`);
+                last_action.innerText = `${display_name}'s air adjusted.`;
+                if (temp_units == '°F') {
+                    new_temp = Math.ceil((inside_temp * 9 / 5) + 32) + '°F';
+                } else {
+                    new_temp = Math.ceil(new_temp + '°C');
+                }
+                currentTemp.innerText = new_temp;
+                insideTemperature.innerText = new_temp;
+                inside_temp = inside_temp + 1;
+            },
+            error:function(error){
+                console.log(`Error ${error}`);
+            }
+        })
+    })
+
+    $('#air-down').click(function() {
+        let new_temp = inside_temp - 1;
+        Url=`https://cors-anywhere.herokuapp.com/https://owner-api.teslamotors.com/api/1/vehicles/${vehicle_id}/command/set_temps?driver_temp=${new_temp}`;
+        $.ajax({
+            url: Url,
+            headers: {
+                "content-type":"application/json; charset=UTF-8",
+                "Authorization":`Bearer ${auth_token}`
+            },
+            type: "Post",
+            success: function(result){
+                console.log(`${vehicle_id}'s adjusted down.`);
+                last_action.innerText = `${display_name}'s air adjusted.`;
+                if (temp_units == '°F') {
+                    new_temp = Math.ceil((inside_temp * 9 / 5) + 32) + '°F';
+                } else {
+                    new_temp = Math.ceil(new_temp + '°C');
+                }
+                currentTemp.innerText = new_temp;
+                insideTemperature.innerText = new_temp;
+                inside_temp = inside_temp - 1;
             },
             error:function(error){
                 console.log(`Error ${error}`);
@@ -470,44 +514,41 @@ function connectVehicle(token) {
     return vehicle_id;
 }
 
+// Map Functions
 function updateMap(vehicle_id) {
-    vehicle_id = document.location.href.split('&')[1].split('=').pop();
-
     mapStatus.innerText = `Finding...`;
     let new_lat = -1;
     let new_lng = -1;
     let current_time = -1;
 
     Url=`https://cors-anywhere.herokuapp.com/https://owner-api.teslamotors.com/api/1/vehicles/${vehicle_id}/vehicle_data`;
-        $.ajax({
-            url: Url,
-            headers: {
-                "content-type":"application/json; charset=UTF-8",
-                "Authorization":`Bearer ${auth_token}`
-            },
-            type: "GET",
-            success: function(result){
-                console.log(result);
-                new_lat = result["response"]["drive_state"]["latitude"];
-                new_lng = result["response"]["drive_state"]["longitude"];
+    $.ajax({
+        url: Url,
+        headers: {
+            "content-type":"application/json; charset=UTF-8",
+            "Authorization":`Bearer ${auth_token}`
+        },
+        type: "GET",
+        success: function(result){
+            console.log(result);
+            new_lat = result["response"]["drive_state"]["latitude"];
+            new_lng = result["response"]["drive_state"]["longitude"];
 
-                initMap(new_lat, new_lng);
-                current_time = getCurrentTime();
-                mapStatus.innerText = `Map updated to show vehicle's location. (${current_time})`;
-            },
-            error:function(error){
-                console.log(`Error ${error}`)
-                console.log('Map update failed');
-            }
-        })
+            initMap(new_lat, new_lng);
+            current_time = getCurrentTime();
+            mapStatus.innerText = `Map updated to show vehicle's location. (${current_time})`;
+        },
+        error:function(error){
+            console.log(`Error ${error}`)
+            console.log('Map update failed');
+            mapStatus.innerText = `Map update failed...\nPlease 'Update Location'.`;
+        }
+    })
 }
 
 function onloadMapUpdate() {
     mapStatus.innerText = "Map initiated.";
-
-    auth_token = document.location.href.split('&')[0].split('=').pop();
-    vehicle_id = connectVehicle(auth_token);
-    setTimeout(function(){ updateMap(vehicle_id) }, 2000);
+    setTimeout(function(){ updateMap(vehicle_id) }, 5000);
 }
 
 function getCurrentTime() {
@@ -526,9 +567,6 @@ function getInfo(token) {
         type: "GET",
         success: function(result){
             console.log(result);
-            let range_units = -1;
-            let range_units_time = -1;
-            let temp_units = -1;
 
             if (result["response"]["gui_settings"]["gui_charge_rate_units"] == "mi/hr") {
                 range_units = "miles"
@@ -546,95 +584,129 @@ function getInfo(token) {
 
             vehicle_id = result["response"]["id_s"];
             display_name = result["response"]["display_name"];
-            if (document.location.href.split('/').pop().split('?')[0] != "map.html") {
-                document.location.href.split('/').pop().split('?')[0];
-                vehicle_name.innerText = display_name;
+            
+            vehicle_name.innerText = display_name;
 
-                current_state = result["response"]["state"];
-                state.innerText = current_state;
+            current_state = result["response"]["state"];
+            state.innerText = current_state;
 
-                car_type = result["response"]["vehicle_config"]["car_type"];
-                wheel_type = result["response"]["vehicle_config"]["wheel_type"];
-                exterior_color = result["response"]["vehicle_config"]["exterior_color"];
+            car_type = result["response"]["vehicle_config"]["car_type"];
+            wheel_type = result["response"]["vehicle_config"]["wheel_type"];
+            exterior_color = result["response"]["vehicle_config"]["exterior_color"];
 
-                vehicleImg.src = `./img/${car_type}/${wheel_type}/${exterior_color}.png`;
-                vehicleImg2.src = `./img/${car_type}/${wheel_type}/${exterior_color}.png`;
+            vehicleImg.src = `./img/${car_type}/${wheel_type}/${exterior_color}.png`;
+            vehicleImg2.src = `./img/${car_type}/${wheel_type}/${exterior_color}.png`;
 
-                inside_temp = result["response"]["climate_state"]["inside_temp"];
+            inside_temp = result["response"]["climate_state"]["inside_temp"];
+            
+            if (temp_units == "°F") {
                 inside_temp = (inside_temp * 9 / 5) + 32;
                 insideTemperature.innerText = Math.round(inside_temp) + " " + temp_units;
                 insideTemperatureClimate.innerText = Math.round(inside_temp) + " " + temp_units;
-
-                outside_temp = result["response"]["climate_state"]["outside_temp"];
-                outside_temp = (outside_temp * 9 / 5) + 32;
-                outsideTemperatureClimate.innerText = Math.round(outside_temp) + " " + temp_units;
-
-                odometer_miles = result["response"]["vehicle_state"]["odometer"];
-                odometer_miles = Math.round(odometer_miles);
-                odometer.innerText = odometer_miles + " miles";
-
-                climate_mode = result["response"]["climate_state"]["is_climate_on"];
-                if (climate_mode) {
-                    climate_mode = "On";
-                    acOnOff.innerHTML = "<img src='img/Climate-On.png'>"
-                } else {
-                    climate_mode = "Off";
-                    acOnOff.innerHTML = "<img src='img/Climate-Off.png'>"
-                }
-
-                currentRange = Math.round(result["response"]["charge_state"]["battery_range"]) + " " + range_units + " (" + result["response"]["charge_state"]["battery_level"] + "%)";
-                range.innerText = currentRange;
-
-                currentChargeState = result["response"]["charge_state"]["charging_state"];
-                chargeState.innerText = currentChargeState;
-
-                currentRate = result["response"]["charge_state"]["charge_rate"] + " " + range_units_time;
-                chargeRate.innerText = currentRate;
-
-                timeRemaining = result["response"]["charge_state"]["time_to_full_charge"];
-                if (timeRemaining) {
-                    let hours = timeRemaining - (timeRemaining % 1);
-                    let minutes = Math.round((timeRemaining % 1) * 60);
-                    timeRemaining = `${hours} hr ${minutes} min`;
-
-                    remaining.innerText = timeRemaining;
-                }
-
-                vehicleModel = result["response"]["vehicle_config"]["car_type"].split("model")[1];
-                model.innerText = vehicleModel;
-
-                vehicleVersion = result["response"]["vehicle_state"]["car_version"].split(" ")[0];
-                version.innerText = vehicleVersion;
-
-                sentryMode = result["response"]["vehicle_state"]["sentry_mode"];
-                if (sentryMode) {
-                    sentryMode = "Online";
-                } else {
-                    sentryMode = "Offline"
-                }
-                sentry.innerText = sentryMode;
-
-                door_state = result["response"]["vehicle_state"]["locked"];
-                lockUnlock.toggleClass('fa-lock');
-                if (door_state) {
-                    door_state = "locked";
-                    lockUnlock.addClass('fa-lock');
-                } else {
-                    door_state = "unlocked";
-                    lockUnlock.addClass('fa-unlock');
-                }
-
-                if (loaded == 0) {
-                    showPage();
-                    loaded = 1;
-                } 
+                currentTemp.innerText = Math.round(inside_temp);
+                inside_temp = Math.round((inside_temp - 32) * 5/9);
+            } else {
+                insideTemperature.innerText = Math.round(inside_temp) + " " + temp_units;
+                insideTemperatureClimate.innerText = Math.round(inside_temp) + " " + temp_units;
+                currentTemp.innerText = inside_temp;
             }
+
+            outside_temp = result["response"]["climate_state"]["outside_temp"];
+            if (temp_units == "°F") {
+                outside_temp = Math.round(outside_temp * 9 / 5) + 32;
+                outsideTemperatureClimate.innerText = Math.round(outside_temp) + " " + temp_units;
+                outside_temp = Math.round((outside_temp - 32) * 5/9)
+            } else {
+                outsideTemperatureClimate.innerText = Math.round(outside_temp) + " " + temp_units;
+            }
+            
+            outsideTemperatureClimate.innerText = Math.round(outside_temp) + " " + temp_units;
+
+            odometer_miles = result["response"]["vehicle_state"]["odometer"];
+            odometer_miles = Math.round(odometer_miles);
+            odometer.innerText = odometer_miles + " miles";
+
+            climate_mode = result["response"]["climate_state"]["is_climate_on"];
+            if (climate_mode) {
+                climate_mode = "On";
+                acOnOff.innerHTML = "<img src='img/Climate-On.png'>"
+            } else {
+                climate_mode = "Off";
+                acOnOff.innerHTML = "<img src='img/Climate-Off.png'>"
+            }
+
+            currentRange = Math.round(result["response"]["charge_state"]["battery_range"]) + " " + range_units + " (" + result["response"]["charge_state"]["battery_level"] + "%)";
+            range.innerText = currentRange;
+
+            currentChargeState = result["response"]["charge_state"]["charging_state"];
+            chargeState.innerText = currentChargeState;
+
+            currentRate = result["response"]["charge_state"]["charge_rate"] + " " + range_units_time;
+            chargeRate.innerText = currentRate;
+
+            timeRemaining = result["response"]["charge_state"]["time_to_full_charge"];
+            if (timeRemaining) {
+                let hours = timeRemaining - (timeRemaining % 1);
+                let minutes = Math.round((timeRemaining % 1) * 60);
+                timeRemaining = `${hours} hr ${minutes} min`;
+
+                remaining.innerText = timeRemaining;
+            }
+
+            vehicleModel = result["response"]["vehicle_config"]["car_type"].split("model")[1];
+            model.innerText = vehicleModel;
+
+            vehicleVersion = result["response"]["vehicle_state"]["car_version"].split(" ")[0];
+            version.innerText = vehicleVersion;
+
+            sentryMode = result["response"]["vehicle_state"]["sentry_mode"];
+            if (sentryMode) {
+                sentryMode = "Online";
+            } else {
+                sentryMode = "Offline"
+            }
+            sentry.innerText = sentryMode;
+
+            door_state = result["response"]["vehicle_state"]["locked"];
+            lockUnlock.toggleClass('fa-lock');
+            if (door_state) {
+                door_state = "locked";
+                lockUnlock.addClass('fa-lock');
+            } else {
+                door_state = "unlocked";
+                lockUnlock.addClass('fa-unlock');
+            }
+
+            if (loaded == 0) {
+                showPage();
+                loaded = 1;
+            } 
+            
 
             current_time = getCurrentTime();
             last_updated.innerText = `${current_time}`;
         },
         error:function(error){
             console.log(`Error ${error}`)
+        }
+    })
+}
+
+// Not currently implemented
+function startCar() {
+    Url=`https://cors-anywhere.herokuapp.com/https://owner-api.teslamotors.com//api/1/vehicles/${vehicle_id}/command/remote_start_drive`;
+    $.ajax({
+        url: Url,
+        headers: {
+            "content-type":"application/json; charset=UTF-8",
+            "Authorization":`Bearer ${auth_token}`
+        },
+        type: "Post",
+        success: function(result){
+            console.log(`${vehicle_id} turned on`);
+        },
+        error:function(error){
+            console.log(`Error ${error}`);
         }
     })
 }
@@ -695,10 +767,6 @@ function toggleAC() {
 function showFake() {
     last_action.innerHTML = "<h2 style='margin-bottom: 0px; border-bottom: none;'>This is a preview version of this web application.<h2>"
 
-    let range_units = -1;
-    let range_units_time = -1;
-    let temp_units = -1;
-
     range_units = "miles"
     range_units_time = "mi/hr"
 
@@ -706,76 +774,75 @@ function showFake() {
 
     vehicle_id = -1;
     display_name = "Tester";
-    if (document.location.href.split('/').pop().split('?')[0] != "map.html") {
-        document.location.href.split('/').pop().split('?')[0];
-        vehicle_name.innerText = display_name;
 
-        state.innerText = "Online";
+    vehicle_name.innerText = display_name;
 
-        car_type = "model3";
-        wheel_type = "Sports19";
-        exterior_color = "Red";
+    state.innerText = "Online";
 
-        vehicleImg.src = `./img/${car_type}/${wheel_type}/${exterior_color}.png`;
-        vehicleImg2.src = `./img/${car_type}/${wheel_type}/${exterior_color}.png`;
+    car_type = "model3";
+    wheel_type = "Sports19";
+    exterior_color = "Red";
 
-        inside_temp = 74;
-        insideTemperature.innerText = Math.round(inside_temp) + " " + temp_units;
-        insideTemperatureClimate.innerText = Math.round(inside_temp) + " " + temp_units;
+    vehicleImg.src = `./img/${car_type}/${wheel_type}/${exterior_color}.png`;
+    vehicleImg2.src = `./img/${car_type}/${wheel_type}/${exterior_color}.png`;
 
-        outside_temp = 90;
-        outsideTemperatureClimate.innerText = Math.round(outside_temp) + " " + temp_units;
+    inside_temp = 74;
+    insideTemperature.innerText = Math.round(inside_temp) + " " + temp_units;
+    insideTemperatureClimate.innerText = Math.round(inside_temp) + " " + temp_units;
 
-        odometer_miles = 12345;
-        odometer_miles = Math.round(odometer_miles);
-        odometer.innerText = odometer_miles + " miles";
+    outside_temp = 90;
+    outsideTemperatureClimate.innerText = Math.round(outside_temp) + " " + temp_units;
 
-        climate_mode = 1;
-        if (climate_mode) {
-            climate_mode = "On";
-            acOnOff.innerHTML = "<img src='img/Climate-On.png'>"
-        } else {
-            climate_mode = "Off";
-            acOnOff.innerHTML = "<img src='img/Climate-Off.png'>"
-        }
+    odometer_miles = 12345;
+    odometer_miles = Math.round(odometer_miles);
+    odometer.innerText = odometer_miles + " miles";
 
-        range.innerText = "155 miles (50%)";
-
-        chargeState.innerText = "Charging";
-
-        chargeRate.innerText = "40 " + "mi/hr";
-
-        timeRemaining = 3.875;
-        if (timeRemaining) {
-            let hours = timeRemaining - (timeRemaining % 1);
-            let minutes = Math.round((timeRemaining % 1) * 60);
-            timeRemaining = `${hours} hr ${minutes} min`;
-
-            remaining.innerText = timeRemaining;
-        }
-
-        model.innerText = "3";
-
-        version.innerText = "2020.32.3";
-
-        sentryMode = "Online";
-        sentry.innerText = sentryMode;
-
-        door_state = 1;
-        lockUnlock.toggleClass('fa-lock');
-        if (door_state) {
-            door_state = "locked";
-            lockUnlock.addClass('fa-lock');
-        } else {
-            door_state = "unlocked";
-            lockUnlock.addClass('fa-unlock');
-        }
-
-        if (loaded == 0) {
-            showPage();
-            loaded = 1;
-        } 
+    climate_mode = 1;
+    if (climate_mode) {
+        climate_mode = "On";
+        acOnOff.innerHTML = "<img src='img/Climate-On.png'>"
+    } else {
+        climate_mode = "Off";
+        acOnOff.innerHTML = "<img src='img/Climate-Off.png'>"
     }
+
+    range.innerText = "155 miles (50%)";
+
+    chargeState.innerText = "Charging";
+
+    chargeRate.innerText = "40 " + "mi/hr";
+
+    timeRemaining = 3.875;
+    if (timeRemaining) {
+        let hours = timeRemaining - (timeRemaining % 1);
+        let minutes = Math.round((timeRemaining % 1) * 60);
+        timeRemaining = `${hours} hr ${minutes} min`;
+
+        remaining.innerText = timeRemaining;
+    }
+
+    model.innerText = "3";
+
+    version.innerText = "2020.32.3";
+
+    sentryMode = "Online";
+    sentry.innerText = sentryMode;
+
+    door_state = 1;
+    lockUnlock.toggleClass('fa-lock');
+    if (door_state) {
+        door_state = "locked";
+        lockUnlock.addClass('fa-lock');
+    } else {
+        door_state = "unlocked";
+        lockUnlock.addClass('fa-unlock');
+    }
+
+    if (loaded == 0) {
+        showPage();
+        loaded = 1;
+    } 
+    
 
     current_time = getCurrentTime();
     last_updated.innerText = `${current_time}`;

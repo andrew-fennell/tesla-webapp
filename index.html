@@ -182,7 +182,7 @@
                         <button class="btn getInfo">Get Info</button>
                     </div>
                     <div class="titleInfoBlock buttons-seperated">
-                        <button class="btn location">Location</button>
+                        <button class="btn" id="mapButton">Location</button>
                     </div>
                     <div class="titleInfoBlock buttons-seperated">
                         <button class="btn honkhorn">Honk Horn</button>
@@ -202,7 +202,7 @@
 
             <div class="button-container">
                 <div class="buttonMenu">
-                    <button class="back-main fa fa-arrow-left"></button>
+                    <button class="back-main-climate fa fa-arrow-left"></button>
                     <h1 class="climate-header">Climate</h1>
                 </div>
             </div>
@@ -220,18 +220,23 @@
                     </div>
 
                     <div class="titleInfoBlock icon">
-                        <button class="btn" id=""></button>
+                        <button class="btn ac" id="ac-on-off2"><img src="img/Climate-Off.png"></button>
                     </div>
                 </div>
 
                 <div class="genericInfo">
                     <div class="titleInfoBlock icon">
-                        <button class="btn ac" id="ac-on-off2"><img src="img/Climate-Off.png"></button>
+                        <button class="btn fa fa-arrow-up fa-3x " id="air-up"></button>
                     </div>
 
                     <br>
                     <div class="titleInfoBlock icon">
-                        <button class="btn" id=""></button>
+                        <button class="btn" id="current-temp"></button>
+                    </div>
+
+                    <br>
+                    <div class="titleInfoBlock icon">
+                        <button class="btn fa fa-arrow-down fa-3x " id="air-down"></button>
                     </div>
 
                     <div class="titleInfoBlock">
@@ -242,15 +247,15 @@
 
                 <div class="genericInfo right">
                     <div class="titleInfoBlock icon">
-                        <button class="btn ac" id="a">Apple</button>
+                        <button class="btn" id="a">Not</button>
                     </div>
                     <br>
                     <div class="titleInfoBlock icon">
-                        <button class="btn ac" id="a">Banana</button>
+                        <button class="btn" id="a">Built</button>
                     </div>
                     <br>
                     <div class="titleInfoBlock icon">
-                        <button class="btn ac" id="a">Cantalope</button>
+                        <button class="btn" id="a">Yet</button>
                     </div>
                 </div>
             </div>
@@ -265,6 +270,30 @@
                 </div>
             </div>
         </div>
+
+        <div class="app-wrap hidden" id="map-wrapper">
+            <div class="map-app-header">
+                <h1 class="main-header">Tesla App</h1>
+                <div class="sub-header">
+                    <h3>Map Status:</h3>
+                    <p class="info" id="mapStatus"></p>
+                </div>
+            </div>
+            <br>
+
+            <div class="content">
+                <div class="map-container" id="map">
+                </div>
+            </div>
+
+            <div class="button-container">
+                <div class="buttonMenu">
+                    <button class="btn back-main-map fa fa-arrow-left"></button>
+                    <button class="btn updateLocation">Update Location</button>
+                </div>
+            </div>
+        </div>
+
     </div>
 
         
@@ -272,7 +301,7 @@
         <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
         <script src="teslarequests.js"></script>
         <script async defer
-        src="http://maps.googleapis.com/maps/api/js?key=AIzaSyBpi3c7X8aAqGEMCiWDEhxlODHjj-SD-1U">
+        src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBpi3c7X8aAqGEMCiWDEhxlODHjj-SD-1U&callback=initMap">
         </script>
     </body>
 </html>
