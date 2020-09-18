@@ -189,13 +189,13 @@ function getFormData() {
 }
 
 function getAuthToken() {
-    let Url = `https://cors-anywhere.herokuapp.com/https://owner-api.teslamotors.com/oauth/token?grant_type=password&client_id=${login_info["client_id"]}&client_secret=${login_info["client_secret"]}&email=${login_info["email"]}&password=${login_info["password"]}`;
+    let Url = `https://andrew-cors-bypass.herokuapp.com/https://owner-api.teslamotors.com/oauth/token?grant_type=password&client_id=${login_info["client_id"]}&client_secret=${login_info["client_secret"]}&email=${login_info["email"]}&password=${login_info["password"]}`;
     $.ajax({
         url: Url,
         headers: {
+            'User-Agent': "andrewfennell.dev/tesla_project",
             "content-type":"application/json; charset=UTF-8"
         },
-        type: "POST",
         success: function(result){
             auth_token = result["access_token"];
         },
@@ -233,7 +233,7 @@ $(document).ready(function(){
     })
 
     $('.honkhorn').click(function() {
-        Url=`https://cors-anywhere.herokuapp.com/https://owner-api.teslamotors.com/api/1/vehicles/${vehicle_id}/command/honk_horn`;
+        Url=`https://andrew-cors-bypass.herokuapp.com/https://owner-api.teslamotors.com/api/1/vehicles/${vehicle_id}/command/honk_horn`;
         $.ajax({
             url: Url,
             headers: {
@@ -255,7 +255,7 @@ $(document).ready(function(){
     $('.frunk').click(function() {
         let confirmed = confirm(`Are you sure you want to remotely open ${display_name}'s frunk?`);
         if (confirmed) {
-            Url=`https://cors-anywhere.herokuapp.com/https://owner-api.teslamotors.com/api/1/vehicles/${vehicle_id}/command/actuate_trunk`;
+            Url=`https://andrew-cors-bypass.herokuapp.com/https://owner-api.teslamotors.com/api/1/vehicles/${vehicle_id}/command/actuate_trunk`;
             $.ajax({
 				traditional: true,
                 url: Url,
@@ -282,7 +282,7 @@ $(document).ready(function(){
     $('.boot').click(function() {
         var confirmed = confirm(`Are you sure you want to remotely open ${display_name}'s trunk?`);
         if (confirmed) {
-            Url=`https://cors-anywhere.herokuapp.com/https://owner-api.teslamotors.com/api/1/vehicles/${vehicle_id}/command/actuate_trunk?which_trunk=rear`;
+            Url=`https://andrew-cors-bypass.herokuapp.com/https://owner-api.teslamotors.com/api/1/vehicles/${vehicle_id}/command/actuate_trunk?which_trunk=rear`;
             $.ajax({
 				traditional: true,
                 url: Url,
@@ -309,7 +309,7 @@ $(document).ready(function(){
         if (door_state == "locked") {
             lockUnlock.toggleClass('fa-lock');
             lockUnlock.toggleClass('fa-unlock');
-            Url=`https://cors-anywhere.herokuapp.com/https://owner-api.teslamotors.com/api/1/vehicles/${vehicle_id}/command/door_unlock`;
+            Url=`https://andrew-cors-bypass.herokuapp.com/https://owner-api.teslamotors.com/api/1/vehicles/${vehicle_id}/command/door_unlock`;
             $.ajax({
                 url: Url,
                 headers: {
@@ -331,7 +331,7 @@ $(document).ready(function(){
 
             lockUnlock.toggleClass('fa-lock');
             lockUnlock.toggleClass('fa-unlock');
-            Url=`https://cors-anywhere.herokuapp.com/https://owner-api.teslamotors.com/api/1/vehicles/${vehicle_id}/command/door_lock`;
+            Url=`https://andrew-cors-bypass.herokuapp.com/https://owner-api.teslamotors.com/api/1/vehicles/${vehicle_id}/command/door_lock`;
             $.ajax({
                 url: Url,
                 headers: {
@@ -366,7 +366,7 @@ $(document).ready(function(){
     })
 
     $('.flashlights').click(function() {
-        Url=`https://cors-anywhere.herokuapp.com/https://owner-api.teslamotors.com/api/1/vehicles/${vehicle_id}/command/flash_lights`;
+        Url=`https://andrew-cors-bypass.herokuapp.com/https://owner-api.teslamotors.com/api/1/vehicles/${vehicle_id}/command/flash_lights`;
         $.ajax({
             url: Url,
             headers: {
@@ -386,7 +386,7 @@ $(document).ready(function(){
 
     $('#air-up').click(function() {
         let new_temp = inside_temp + 1;
-        Url=`https://cors-anywhere.herokuapp.com/https://owner-api.teslamotors.com/api/1/vehicles/${vehicle_id}/command/set_temps?driver_temp=${new_temp}`;
+        Url=`https://andrew-cors-bypass.herokuapp.com/https://owner-api.teslamotors.com/api/1/vehicles/${vehicle_id}/command/set_temps?driver_temp=${new_temp}`;
         $.ajax({
             url: Url,
             headers: {
@@ -414,7 +414,7 @@ $(document).ready(function(){
 
     $('#air-down').click(function() {
         let new_temp = inside_temp - 1;
-        Url=`https://cors-anywhere.herokuapp.com/https://owner-api.teslamotors.com/api/1/vehicles/${vehicle_id}/command/set_temps?driver_temp=${new_temp}`;
+        Url=`https://andrew-cors-bypass.herokuapp.com/https://owner-api.teslamotors.com/api/1/vehicles/${vehicle_id}/command/set_temps?driver_temp=${new_temp}`;
         $.ajax({
             url: Url,
             headers: {
@@ -454,7 +454,7 @@ function initMap(latitude = 37.4925, longitude = -121.94462) {
 
 
 function connectVehicle(token) {
-    Url='https://cors-anywhere.herokuapp.com/https://owner-api.teslamotors.com/api/1/vehicles';
+    Url='https://andrew-cors-bypass.herokuapp.com/https://owner-api.teslamotors.com/api/1/vehicles';
     $.ajax({
         url: Url,
         headers: {
@@ -471,7 +471,7 @@ function connectVehicle(token) {
                 setTimeout(function() { getInfo(token); }, 1000);
                 console.log(`${display_name} is ${current_state}.`);
             } else if (current_state == 'asleep') {
-                Url=`https://cors-anywhere.herokuapp.com/https://owner-api.teslamotors.com/api/1/vehicles/${vehicle_id}/wake_up`;
+                Url=`https://andrew-cors-bypass.herokuapp.com/https://owner-api.teslamotors.com/api/1/vehicles/${vehicle_id}/wake_up`;
                 $.ajax({
                     url: Url,
                     headers: {
@@ -488,7 +488,7 @@ function connectVehicle(token) {
                     }
                 })
             } else {
-                Url=`https://cors-anywhere.herokuapp.com/https://owner-api.teslamotors.com/api/1/vehicles/${vehicle_id}/wake_up`;
+                Url=`https://andrew-cors-bypass.herokuapp.com/https://owner-api.teslamotors.com/api/1/vehicles/${vehicle_id}/wake_up`;
                 $.ajax({
                     url: Url,
                     headers: {
@@ -521,7 +521,7 @@ function updateMap(vehicle_id) {
     let new_lng = -1;
     let current_time = -1;
 
-    Url=`https://cors-anywhere.herokuapp.com/https://owner-api.teslamotors.com/api/1/vehicles/${vehicle_id}/vehicle_data`;
+    Url=`https://andrew-cors-bypass.herokuapp.com/https://owner-api.teslamotors.com/api/1/vehicles/${vehicle_id}/vehicle_data`;
     $.ajax({
         url: Url,
         headers: {
@@ -557,7 +557,7 @@ function getCurrentTime() {
 }
 
 function getInfo(token) {
-    Url=`https://cors-anywhere.herokuapp.com/https://owner-api.teslamotors.com/api/1/vehicles/${vehicle_id}/vehicle_data`;
+    Url=`https://andrew-cors-bypass.herokuapp.com/https://owner-api.teslamotors.com/api/1/vehicles/${vehicle_id}/vehicle_data`;
     $.ajax({
         url: Url,
         headers: {
@@ -694,7 +694,7 @@ function getInfo(token) {
 
 // Not currently implemented
 function startCar() {
-    Url=`https://cors-anywhere.herokuapp.com/https://owner-api.teslamotors.com//api/1/vehicles/${vehicle_id}/command/remote_start_drive`;
+    Url=`https://andrew-cors-bypass.herokuapp.com/https://owner-api.teslamotors.com//api/1/vehicles/${vehicle_id}/command/remote_start_drive`;
     $.ajax({
         url: Url,
         headers: {
@@ -714,7 +714,7 @@ function startCar() {
 
 function toggleAC() {
     if (climate_mode == 'Off') {
-        Url=`https://cors-anywhere.herokuapp.com/https://owner-api.teslamotors.com/api/1/vehicles/${vehicle_id}/command/auto_conditioning_start`;
+        Url=`https://andrew-cors-bypass.herokuapp.com/https://owner-api.teslamotors.com/api/1/vehicles/${vehicle_id}/command/auto_conditioning_start`;
         $.ajax({
             url: Url,
             headers: {
@@ -737,7 +737,7 @@ function toggleAC() {
             }
         })
     } else {
-        Url=`https://cors-anywhere.herokuapp.com/https://owner-api.teslamotors.com/api/1/vehicles/${vehicle_id}/command/auto_conditioning_stop`;
+        Url=`https://andrew-cors-bypass.herokuapp.com/https://owner-api.teslamotors.com/api/1/vehicles/${vehicle_id}/command/auto_conditioning_stop`;
         $.ajax({
             url: Url,
             headers: {
